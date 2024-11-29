@@ -54,7 +54,7 @@ export const generateData = () => {
 }
 
 export const reactionStages = [
-    { name: "heatup", start: -1, end: 0, isActive: false },
+    { name: "heatup", start: -1, end: 0, isActive: true },
     { name: "reaction", start: -1, end: 0, isActive: false },
     { name: "crystallization", start: -1, end: 0, isActive: false },
     { name: "cooldown", start: -1, end: 0, isActive: false },

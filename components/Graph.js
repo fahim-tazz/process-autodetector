@@ -54,7 +54,8 @@ const Graph = (props) => {
         stagesRef.current = props.stages.map((stage, index) => ({
           name: stage.name,
           start: xScale.min + interval * index, // Start position for this stage
-          end: xScale.min + interval * (index + 1) - 10000, // End position for this stage
+          end: xScale.min + interval * (index + 1) - 20000, // End position for this stage
+          isActive: stage.isActive,
           isDragging: false,
           draggedLine: null, // Tracks which line ("start" or "end") is being dragged
         }));
@@ -64,6 +65,7 @@ const Graph = (props) => {
             name: stage.name,
             start: stage.start,
             end: stage.end,
+            isActive: stage.isActive,
             isDragging: false,
             draggedLine: null, // Tracks which line ("start" or "end") is being dragged
         }));
@@ -72,27 +74,58 @@ const Graph = (props) => {
       // Register the line plugin after initialization
       ChartJS.register(linePlugin);
     }
-  }, [props.stages, numStages]);
+  }, [props.stages]);
 
   const linePlugin = {
     id: "linePlugin",
-    beforeDraw: (chart) => {
+    afterDatasetsDraw: (chart) => {
       const ctx = chart.ctx
       ctx.save();
-      stagesRef.current.forEach((stage) => {
-        ctx.strokeStyle = "red";
+      stagesRef.current.forEach((stage, index) => {
+        const isActive = stage.isActive;
+        ctx.strokeStyle = isActive ? "red" : "grey";
+        ctx.lineWidth = isActive ? 3 : 1.5;
         ctx.beginPath();
         const startPosition = chart.scales.x.getPixelForValue(stage.start)
         ctx.moveTo(startPosition, chart.scales.y.top);
         ctx.lineTo(startPosition, chart.scales.y.bottom);
         ctx.stroke();     
 
-        ctx.strokeStyle = "blue";
+        ctx.strokeStyle = isActive ? "blue" : "grey";
         ctx.beginPath();
         const endPosition = chart.scales.x.getPixelForValue(stage.end)
         ctx.moveTo(endPosition, chart.scales.y.top);
         ctx.lineTo(endPosition, chart.scales.y.bottom);
         ctx.stroke();     
+
+        if (isActive) {
+          const offset = 10; // Fixed offset integer
+          let centerY = (chart.scales.y.top + chart.scales.y.bottom) / 2;
+          ctx.fillStyle = "red";
+          ctx.beginPath();
+          ctx.arc(
+            startPosition,
+            centerY + offset,
+            5, // Radius of the circle
+            Math.PI / 2, // Start angle (North)
+            (3 * Math.PI) / 2, // End angle (South)
+            true // Counterclockwise direction for right-facing half-circle
+          );          
+          ctx.fill();
+          centerY = (chart.scales.y.top + chart.scales.y.bottom) / 2 + offset;
+          ctx.fillStyle = "blue";
+          ctx.beginPath();
+          ctx.arc(
+            endPosition,
+            centerY - offset,
+            5, // Radius of the circle
+            Math.PI / 2, // Start angle (North)
+            (3 * Math.PI) / 2, // End angle (South)
+            false // Clockwise direction for left-facing half-circle
+          );          
+          ctx.fill();
+        }
+
       })
       ctx.restore();
     }
@@ -115,13 +148,13 @@ const Graph = (props) => {
       const startDistance = Math.abs(stage.start - mouseX);
       const endDistance = Math.abs(stage.end - mouseX);
   
-      if (startDistance < closestDistance) {
+      if (startDistance < closestDistance && stage.isActive) {
         closestDistance = startDistance;
         closestStageIndex = index;
         closestKey = "start";
       }
   
-      if (endDistance < closestDistance) {
+      if (endDistance < closestDistance && stage.isActive) {
         closestDistance = endDistance;
         closestStageIndex = index;
         closestKey = "end";
