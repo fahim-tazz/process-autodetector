@@ -11,7 +11,7 @@ import {
   TimeScale
 } from "chart.js";
 import "chartjs-adapter-date-fns";
-import "@/styles/graph.module.css";
+import styles from "@/styles/graph.module.css";
 
 
 ChartJS.register(LinearScale, TimeScale, PointElement, LineElement, Title, Tooltip, Legend);
