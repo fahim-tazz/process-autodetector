@@ -15,11 +15,16 @@ export const generateData = () => {
         labels: labels,
         datasets: [
             {
-            label: "Temperature (°C)",
-            data: data,
-            borderColor: "teal",
-            tension: 0.1,
-            fill: false
+                label: "Temperature (°C)",
+                data: data,
+                borderColor: "#0097a7",
+                backgroundColor: "rgba(0, 151, 167, 0.2)", // Soft fill under the curve
+                borderWidth: 2,
+                tension: 0.4, // Smooth curve
+                pointBackgroundColor: "#ffffff", // White point background
+                pointBorderColor: "#0097a7",
+                pointBorderWidth: 2,
+                pointHoverRadius: 6,
             }
         ]
     };
@@ -30,6 +35,14 @@ export const generateData = () => {
         plugins: {
             legend: { position: "top" },
             title: { display: true, text: "Temperature vs. Time (1 Hour)" },
+            tooltip: {
+                backgroundColor: "#ffffff", // White background
+                titleColor: "#333333", // Dark text for better readability
+                bodyColor: "#666666",
+                borderColor: "#cccccc",
+                borderWidth: 1,
+                cornerRadius: 8,
+            }
         },
         scales: {
             x: {
