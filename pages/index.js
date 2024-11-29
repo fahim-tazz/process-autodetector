@@ -4,12 +4,12 @@ import { generateData, reactionStages } from "@/utils/dataGenerator";
 
 export default function Home() {
   const [{ dummyData, options }] = useState(generateData());
-  const [expanded, setExpanded] = useState(reactionStages);
+  const [stages, setStages] = useState(reactionStages);
 
-  const toggleExpand = (section) => {
-    setExpanded((prev) =>
+  const toggleStage = (section) => {
+    setStages((prev) =>
       prev.map((item) =>
-        item.name === section ? { ...item, expanded: true } : { ...item, expanded: false }
+        item.name === section ? { ...item, isActive: true } : { ...item, isActive: false }
       )
     );
   };
@@ -76,19 +76,19 @@ export default function Home() {
       {/* Sidebar */}
       <div style={styles.sidebar}>
         <h2 style={styles.sidebarHeading}>Process Stages</h2>
-        {expanded.map((stage) => (
+        {stages.map((stage) => (
           <div key={stage.name} style={styles.sidebarItem}>
             <div
-              onClick={() => toggleExpand(stage.name)}
+              onClick={() => toggleStage(stage.name)}
               
               style={{
                 ...styles.sidebarHeader,
-                color: stage.expanded ? "#00bcd4" : "white", // Highlight expanded item
+                color: stage.isActive ? "#00bcd4" : "white", // Highlight expanded item
               }}
             >
               {stage.name.charAt(0).toUpperCase() + stage.name.slice(1)}
             </div>
-            {stage.expanded && (
+            {stage.isActive && (
               <div style={styles.sidebarContent}>
                 Content for {stage.name}
               </div>
