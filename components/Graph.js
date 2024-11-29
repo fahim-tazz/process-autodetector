@@ -102,26 +102,26 @@ const Graph = (props) => {
         ctx.lineTo(endPosition, chart.scales.y.bottom);
         ctx.stroke();     
 
-        if (isActive) {
+        if (true) {
           let centerY = (chart.scales.y.top + chart.scales.y.bottom) / 2;
-          ctx.fillStyle = "red";
+          ctx.fillStyle = isActive ? "red" : "grey";
           ctx.beginPath();
           ctx.arc(
             startPosition,
             centerY + offset,
-            offset/2, // Radius of the circle
+            isActive ? offset/2 : offset/3, // Radius of the circle
             Math.PI / 2, // Start angle (North)
             (3 * Math.PI) / 2, // End angle (South)
             true // Counterclockwise direction for right-facing half-circle
           );          
           ctx.fill();
           centerY = (chart.scales.y.top + chart.scales.y.bottom) / 2 + offset;
-          ctx.fillStyle = "blue";
+          ctx.fillStyle = isActive ? "blue" : "grey";          
           ctx.beginPath();
           ctx.arc(
             endPosition,
             centerY - offset,
-            offset/2, // Radius of the circle
+            isActive ? offset/2 : offset/3, // Radius of the circle
             Math.PI / 2, // Start angle (North)
             (3 * Math.PI) / 2, // End angle (South)
             false // Clockwise direction for left-facing half-circle

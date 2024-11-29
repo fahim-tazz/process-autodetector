@@ -10,15 +10,15 @@
 /* Sidebar */
 .sidebar {
   width: 250px;
-  background: linear-gradient(180deg, #0d3b3c, #115b5d); /* Subtle gradient */
   padding: 20px;
   border-right: 2px solid #083d3f;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   color: white;
-  box-shadow: 3px 0px 10px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
   border-radius: 12px 0 0 12px;
+  background: linear-gradient(180deg, #115b5d, #0a2e2f); /* Darker gradient bottom */
+  box-shadow: 4px 0px 10px rgba(0, 0, 0, 0.2);
 }
 
 .sidebarHeading {
@@ -42,9 +42,9 @@
 }
 
 .sidebarItem:hover {
-  background-color: rgba(0, 188, 212, 0.3); /* Subtle hover effect */
-  transform: scale(1.05); /* Slight scale on hover */
-  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow on hover */
+  background-color: rgba(0, 188, 212, 0.4); /* More vivid hover */
+  transform: scale(1.08); /* More noticeable scale effect */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15); /* Enhance shadow */
 }
 
 .sidebarHeader {
@@ -76,11 +76,12 @@
 /* Main Content */
 .mainContent {
   flex: 1;
-  padding: 30px; /* Increased padding for better spacing */
-  background: linear-gradient(180deg, #ffffff, #f5f7f7); /* Subtle gradient background */
+  padding: 30px;
+  background: linear-gradient(180deg, #fdfdfd, #f7f9fa); /* Subtle gradient for depth */
   overflow-y: auto;
   border-radius: 0 12px 12px 0;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05); /* Slight inner shadow */
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+  border-left: 2px solid #ddeeee; /* Subtle separator between sidebar and main */
 }
 
 /* Chart Customization */
@@ -88,30 +89,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f4f9f9;
-  padding: 25px; /* Increased padding for better balance */
+  background-color: #f7fafa; /* Slightly brighter for clarity */
+  padding: 30px; /* More padding for balance */
   border: 1px solid #ddeeee;
-  border-radius: 15px; /* Softer, more rounded corners */
-  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.15);
-  margin-top: 25px; /* Better spacing from top elements */
+  border-radius: 15px;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 30px;
 }
 
-/* Half-circle Enhancements */
-.halfCircle {
-  border-radius: 50%;
-  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2); /* Make them stand out more */
-  animation: bounce 1s infinite ease-in-out; /* Optional animation for focus */
-}
-
-/* Bounce animation for half-circles */
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
 
 /* Utility Classes */
 .textCenter {
@@ -132,19 +117,20 @@
 
 /* Buttons (if applicable) */
 .button {
-  padding: 10px 20px;
-  background-color: #0097a7;
+  padding: 12px 24px;
+  background-color: #00bcd4;
   color: white;
+  font-weight: bold;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px; /* Slight rounding for consistency */
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .button:hover {
-  background-color: #00bcd4;
-  transform: translateY(-3px);
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Slight hover shadow */
+  background-color: #007a91;
+  transform: translateY(-4px); /* Slight lift effect */
+  box-shadow: 0px 5px 8px rgba(0, 0, 0, 0.2); /* Hover shadow for pop */
 }
 
 /* Scrollbar Customization */
@@ -161,7 +147,7 @@
 
 .sidebar::-webkit-scrollbar-thumb,
 .mainContent::-webkit-scrollbar-thumb {
-  background-color: #0d3b3c;
+  background-color: #00bcd4; /* Match active element color */
   border-radius: 10px;
-  border: 2px solid #f1f1f1;
+  border: 2px solid #e8f6f6;
 }
