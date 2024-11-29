@@ -16,10 +16,12 @@ import "chartjs-adapter-date-fns";
 ChartJS.register(LinearScale, TimeScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const Graph = (props) => {
-  const barXPosition = useRef(null)
+  const numStages = props.stages.length;
+  const stagesRef = useRef(Array.from({ length: numStages }, () => ({})));
   const chartRef = useRef(null);
-  const isDraggingRef = useRef(false);
+  const isDraggingRef = useRef(Array.from({ length: numStages }, () => (false)));
   
+  // Event Listeners
   useEffect(() => {
     const canvas = chartRef.current?.canvas;
   
@@ -38,52 +40,142 @@ const Graph = (props) => {
     };
   }, []);
 
+  // Bind Refs to barXPositions, chart, isDragging
   useEffect(() => {
     if (chartRef.current) {
       const chart = chartRef.current;
       const xScale = chart.scales.x;
-      const midpoint = (xScale.min + xScale.max) / 2; // Calculate midpoint
-      const quartile = xScale.min + (xScale.max - xScale.min) / 4; // Calculate midpoint
-      barXPosition.current = quartile; // Set the bar position
+  
+      // Calculate the interval for evenly spacing start and end positions
+      const interval = (xScale.max - xScale.min) / numStages;
+    
+      if (props.stages[0].start == -1) {
+        // Initial Mount
+        stagesRef.current = props.stages.map((stage, index) => ({
+          name: stage.name,
+          start: xScale.min + interval * index, // Start position for this stage
+          end: xScale.min + interval * (index + 1) - 10000, // End position for this stage
+          isDragging: false,
+          draggedLine: null, // Tracks which line ("start" or "end") is being dragged
+        }));
+      } else {        
+        // Subsequent Mounts
+        stagesRef.current = props.stages.map((stage, index) => ({
+            name: stage.name,
+            start: stage.start,
+            end: stage.end,
+            isDragging: false,
+            draggedLine: null, // Tracks which line ("start" or "end") is being dragged
+        }));
+      }
+  
+      // Register the line plugin after initialization
       ChartJS.register(linePlugin);
     }
-  }, []);
+  }, [props.stages, numStages]);
 
   const linePlugin = {
     id: "linePlugin",
     beforeDraw: (chart) => {
       const ctx = chart.ctx
       ctx.save();
-      ctx.strokeStyle = "red";
-      ctx.beginPath();
-      const position = chart.scales.x.getPixelForValue(barXPosition.current)
-      console.log(position)
-      ctx.moveTo(position, chart.scales.y.top);
-      ctx.lineTo(position, chart.scales.y.bottom);
-      ctx.stroke();     
+      stagesRef.current.forEach((stage) => {
+        ctx.strokeStyle = "red";
+        ctx.beginPath();
+        const startPosition = chart.scales.x.getPixelForValue(stage.start)
+        ctx.moveTo(startPosition, chart.scales.y.top);
+        ctx.lineTo(startPosition, chart.scales.y.bottom);
+        ctx.stroke();     
+
+        ctx.strokeStyle = "blue";
+        ctx.beginPath();
+        const endPosition = chart.scales.x.getPixelForValue(stage.end)
+        ctx.moveTo(endPosition, chart.scales.y.top);
+        ctx.lineTo(endPosition, chart.scales.y.bottom);
+        ctx.stroke();     
+      })
       ctx.restore();
     }
   } 
 
   const handleMouseDown = (event) => {
-    isDraggingRef.current = true
-  }
+    if (!chartRef.current) return;
   
-  const handleMouseUp = (event) => {
-    isDraggingRef.current = false;
-  }
-
-  const handleMouseMove = (event) => {
-    if (!isDraggingRef.current || !chartRef.current) return;
-
     const chart = chartRef.current;
     const xScale = chart.scales.x;
-    // console.log("X-Pos, Mouse Drag ", barXPosition.current, event.offsetX);
-    const newPosition = xScale.getValueForPixel(event.offsetX);
-    if (newPosition >= xScale.min && newPosition <= xScale.max) {
-      barXPosition.current = newPosition;
-      chart.update();
+  
+    // Convert mouse X position to chart value
+    const mouseX = xScale.getValueForPixel(event.offsetX);
+  
+    let closestStageIndex = null;
+    let closestKey = null; // "start" or "end"
+    let closestDistance = Infinity;
+  
+    stagesRef.current.forEach((stage, index) => {
+      const startDistance = Math.abs(stage.start - mouseX);
+      const endDistance = Math.abs(stage.end - mouseX);
+  
+      if (startDistance < closestDistance) {
+        closestDistance = startDistance;
+        closestStageIndex = index;
+        closestKey = "start";
+      }
+  
+      if (endDistance < closestDistance) {
+        closestDistance = endDistance;
+        closestStageIndex = index;
+        closestKey = "end";
+      }
+    });
+  
+    // If the nearest line is close enough, enable dragging
+    if (closestDistance < 50000 && closestStageIndex !== null) {
+      stagesRef.current.forEach((stage, index) => {
+        stage.isDragging = index === closestStageIndex; // Only one stage can be dragged at a time
+        stage.draggedLine = index === closestStageIndex ? closestKey : null; // Track which line is being dragged
+      });
+      console.log("MOUSE DOWN ---> SELECTED: ", closestStageIndex, closestKey)
+    } else {
+      console.log("MOUSE DOWN ---> NONE SELECTED")
+      console.log("Closest index/distance: ", closestStageIndex, closestKey, closestDistance)
     }
+  };  
+
+  const handleMouseUp = () => {
+    stagesRef.current.forEach((stage) => {
+      stage.isDragging = false; // Reset dragging state
+      stage.draggedLine = null; // Clear which line was being dragged
+      console.log("MOUSE UP")
+    });
+    props.onStageUpdate((prevStages) =>
+      prevStages.map((stage, index) => ({
+        ...stage,
+        start: stagesRef.current[index].start, 
+        end: stagesRef.current[index].end,
+      }))
+    );
+  };
+
+  const handleMouseMove = (event) => {
+    if (!chartRef.current) return;
+  
+    const chart = chartRef.current;
+    const xScale = chart.scales.x;
+  
+    // Convert mouse X position to chart value
+    const newPosition = xScale.getValueForPixel(event.offsetX);
+  
+    // Update the position for the active stage and line
+    stagesRef.current.forEach((stage) => {
+      if (stage.isDragging && stage.draggedLine) {
+        if (stage.draggedLine === "start" && newPosition < stage.end) {
+          stage.start = newPosition;
+        } else if (stage.draggedLine === "end" && newPosition > stage.start) {
+          stage.end = newPosition;
+        }
+        chart.update(); // Trigger a redraw
+      }
+    });
   };
   
 return (

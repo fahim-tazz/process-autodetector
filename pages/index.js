@@ -98,7 +98,7 @@ export default function Home() {
       </div>
       {/* Main Content */}
       <div style={styles.mainContent}>
-        <Graph data={dummyData} options={options} />
+        <Graph data={dummyData} options={options} stages={stages} onStageUpdate={setStages}/>
       </div>
     </div>
   );
