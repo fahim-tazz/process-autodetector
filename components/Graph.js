@@ -15,6 +15,8 @@ import "chartjs-adapter-date-fns";
 
 ChartJS.register(LinearScale, TimeScale, PointElement, LineElement, Title, Tooltip, Legend);
 
+const offset = 20; // Fixed offset integer
+
 const Graph = (props) => {
   const numStages = props.stages.length;
   const stagesRef = useRef(Array.from({ length: numStages }, () => ({})));
@@ -73,6 +75,7 @@ const Graph = (props) => {
   
       // Register the line plugin after initialization
       ChartJS.register(linePlugin);
+      chart.update()
     }
   }, [props.stages]);
 
@@ -84,7 +87,7 @@ const Graph = (props) => {
       stagesRef.current.forEach((stage, index) => {
         const isActive = stage.isActive;
         ctx.strokeStyle = isActive ? "red" : "grey";
-        ctx.lineWidth = isActive ? 3 : 1.5;
+        ctx.lineWidth = isActive ? 4 : 2;
         ctx.beginPath();
         const startPosition = chart.scales.x.getPixelForValue(stage.start)
         ctx.moveTo(startPosition, chart.scales.y.top);
@@ -99,14 +102,13 @@ const Graph = (props) => {
         ctx.stroke();     
 
         if (isActive) {
-          const offset = 10; // Fixed offset integer
           let centerY = (chart.scales.y.top + chart.scales.y.bottom) / 2;
           ctx.fillStyle = "red";
           ctx.beginPath();
           ctx.arc(
             startPosition,
             centerY + offset,
-            5, // Radius of the circle
+            offset/2, // Radius of the circle
             Math.PI / 2, // Start angle (North)
             (3 * Math.PI) / 2, // End angle (South)
             true // Counterclockwise direction for right-facing half-circle
@@ -118,7 +120,7 @@ const Graph = (props) => {
           ctx.arc(
             endPosition,
             centerY - offset,
-            5, // Radius of the circle
+            offset/2, // Radius of the circle
             Math.PI / 2, // Start angle (North)
             (3 * Math.PI) / 2, // End angle (South)
             false // Clockwise direction for left-facing half-circle
@@ -197,13 +199,15 @@ const Graph = (props) => {
   
     // Convert mouse X position to chart value
     const newPosition = xScale.getValueForPixel(event.offsetX);
-  
     // Update the position for the active stage and line
-    stagesRef.current.forEach((stage) => {
+    stagesRef.current.forEach((stage, index) => {
+      const upperBoundX = index < stagesRef.current.length - 1? stagesRef.current[index+1].start : xScale.max 
+      const lowerBoundX = index > 0 ? stagesRef.current[index-1].end : xScale.min;
+      const isWithinBounds = (newPosition < upperBoundX - offset) && (newPosition > lowerBoundX + offset)
       if (stage.isDragging && stage.draggedLine) {
-        if (stage.draggedLine === "start" && newPosition < stage.end) {
+        if (stage.draggedLine === "start" && newPosition < stage.end && isWithinBounds) {
           stage.start = newPosition;
-        } else if (stage.draggedLine === "end" && newPosition > stage.start) {
+        } else if (stage.draggedLine === "end" && newPosition > stage.start && isWithinBounds) {
           stage.end = newPosition;
         }
         chart.update(); // Trigger a redraw
