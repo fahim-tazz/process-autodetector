@@ -1,0 +1,29 @@
+/* styles/graph.css */
+
+.graph-container {
+    width: 100%;
+    height: 400px;
+  }
+  
+  /* Style for the red and blue vertical lines */
+  .line-active {
+    stroke-width: 4px;
+  }
+  
+  .line-inactive {
+    stroke-width: 2px;
+    stroke: grey;
+  }
+  
+  /* Styling for the half-circle markers */
+  .marker-active-start {
+    fill: red;
+  }
+  
+  .marker-active-end {
+    fill: blue;
+  }
+  
+  .marker-inactive {
+    fill: grey;
+  }

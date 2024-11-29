@@ -1,6 +1,7 @@
 import Graph from "../components/Graph";
 import { useState } from "react";
 import { generateData, reactionStages } from "@/utils/dataGenerator";
+import "@/styles/home.module.css";
 
 export default function Home() {
   const [{ dummyData, options }] = useState(generateData());
