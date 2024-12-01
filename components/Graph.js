@@ -258,7 +258,7 @@ return (
     <div style={{ width: "100%", height: "400px" }}>
       <Line ref={chartRef} data={props.data} options={props.options} />
       <div style={{ marginTop: "10px", textAlign: "center", fontSize: "12px", color: "#c2c2c2" }}>
-            Tip: Double-click a section to select that reaction stage or drag the lines to adjust the start and end points of each chemical reaction stage.
+            Tip: Double-click a section to select that reaction stage and drag the lines to adjust the start and end points of each chemical reaction stage.
       </div>
     </div>
   );

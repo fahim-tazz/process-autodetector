@@ -75,7 +75,7 @@ export const generateData = () => {
                             return {
                                 ...legendLabel,
                                 fillStyle: "rgba(199, 202, 209, 0.4)",
-                                lineWidth: 2,
+                                lineWidth: 3,
                                 borderRadius: 2,
                             }
                         });
