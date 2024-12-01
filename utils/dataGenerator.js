@@ -33,7 +33,55 @@ export const generateData = () => {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-            legend: { position: "top" },
+            legend: {
+                position: "top",
+                labels: {
+                    generateLabels: (chart) => {
+                        const datasetLabels = chart.data.datasets.map((dataset, i) => ({
+                            text: dataset.label,
+                            // fillStyle: dataset.borderColor,
+                            strokeStyle:dataset.borderColor,
+                            hidden: !chart.isDatasetVisible(i),
+                            datasetIndex: i,
+                        }));
+                        
+                        // Add custom labels for vertical lines
+                        const customLabels = [
+                            {
+                                text: "Stage Start",
+                                pointStyle: "circle", // Use a circle for the legend marker
+                                fillStyle: "red", // Color of the blue vertical line
+                                strokeStyle: "red",
+                                lineWidth: 2,
+                                hidden: false,
+                            },
+                            {
+                                text: "Stage End",
+                                // fillStyle: "blue", // Color of the blue vertical line
+                                strokeStyle: "blue",
+                                // lineWidth: 2,
+                                hidden: false,
+                            },
+                            {
+                                text: "Unselected Stage",
+                                // fillStyle: "blue", // Color of the blue vertical line
+                                strokeStyle: "grey",
+                                // lineWidth: 2,
+                                hidden: false,
+                            },
+                        ];
+                        
+                        return [...datasetLabels, ...customLabels].map((legendLabel) => {
+                            return {
+                                ...legendLabel,
+                                fillStyle: "rgba(199, 202, 209, 0.4)",
+                                lineWidth: 2,
+                                borderRadius: 2,
+                            }
+                        });
+                    }
+                },
+            },
             title: { display: true, text: "Temperature vs. Time (1 Hour)" },
             tooltip: {
                 backgroundColor: "#ffffff", // White background
