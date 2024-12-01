@@ -2,6 +2,7 @@ import Graph from "../components/Graph";
 import { useState } from "react";
 import { generateData, reactionStages } from "@/utils/dataGenerator";
 import styles from "@/styles/home.module.css";
+import TopBar from "@/components/TopBar";
 
 export default function Home() {
   const [{ dummyData, options }] = useState(generateData());
@@ -42,6 +43,7 @@ export default function Home() {
       </div>
       {/* Main Content */}
       <div className={styles.mainContent}>
+        <TopBar />
         <Graph data={dummyData} options={options} stages={stages} onStageUpdate={setStages}/>
       </div>
     </div>

@@ -1,0 +1,12 @@
+.topBar {
+    flex-direction: row;
+    width: 100vw;
+    height: 100px;
+    background-color: azure;
+    margin-left: -100px;
+    margin-top: -100px;
+    margin-right: -100px;
+    top: 0; /* Position it at the top of the viewport */
+    left: 0; /* Start from the leftmost edge */
+    /* z-index: 1000; Ensure it stays above other elements */
+}
