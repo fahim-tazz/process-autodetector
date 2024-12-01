@@ -34,6 +34,7 @@ const Graph = (props) => {
     canvas.addEventListener("mousemove", handleMouseMove);
     canvas.addEventListener("mouseup", handleMouseUp);
     canvas.addEventListener("mouseleave", handleMouseUp);
+    canvas.addEventListener("dblclick", handleDoubleClick);
   
     return () => {
       canvas.removeEventListener("mousedown", handleMouseDown);
@@ -208,19 +209,47 @@ const Graph = (props) => {
     const newPosition = xScale.getValueForPixel(event.offsetX);
     // Update the position for the active stage and line
     stagesRef.current.forEach((stage, index) => {
-      const upperBoundX = index < stagesRef.current.length - 1? stagesRef.current[index+1].start : xScale.max 
-      const lowerBoundX = index > 0 ? stagesRef.current[index-1].end : xScale.min;
-      const isWithinBounds = (newPosition < upperBoundX - offset) && (newPosition > lowerBoundX + offset)
       if (stage.isDragging && stage.draggedLine) {
-        if (stage.draggedLine === "start" && newPosition < stage.end && isWithinBounds) {
-          stage.start = newPosition;
-        } else if (stage.draggedLine === "end" && newPosition > stage.start && isWithinBounds) {
-          stage.end = newPosition;
+        if (stage.draggedLine === "start") {
+        const upperBoundX = stage.end - offset;
+        const lowerBoundX = index > 0 ? stagesRef.current[index-1].end : xScale.min;
+        if (newPosition > upperBoundX) {
+          stage.start = upperBoundX
+        } else if (newPosition < lowerBoundX) {
+          stage.start = lowerBoundX;
+        } else {
+          stage.start = newPosition
+        }
+        } else if (stage.draggedLine === "end") {
+          const upperBoundX = index < stagesRef.current.length - 1 ? stagesRef.current[index+1].start - offset : xScale.max;
+          const lowerBoundX = stage.start + offset;
+          if (newPosition > upperBoundX) {
+            stage.end = upperBoundX;
+          } else if (newPosition < lowerBoundX) {
+            stage.end = lowerBoundX;
+          } else {
+            stage.end = newPosition;
+          }
         }
         chart.update(); // Trigger a redraw
       }
     });
   };
+
+  const handleDoubleClick = (event) => {
+    const xScale = chartRef.current.scales.x;
+    const clickPosition = xScale.getValueForPixel(event.offsetX);
+    stagesRef.current.forEach((stage) => {
+      if (clickPosition > stage.start && clickPosition < stage.end) {
+        props.onStageUpdate((prevStages) =>
+          prevStages.map((prevStage) => ({
+            ...prevStage,
+            isActive: prevStage.name === stage.name ? true : false
+          })))
+        return;
+      }
+    });
+  }
   
 return (
     <div style={{ width: "100%", height: "400px" }}>
