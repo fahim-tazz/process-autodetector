@@ -135,6 +135,9 @@ const Graph = (props) => {
         if (isActive) {
           ctx.fillStyle = "rgba(0, 151, 167, 0.1)";
           ctx.fillRect(startX, chart.scales.y.top, endX - startX, chart.scales.y.bottom - chart.scales.y.top);
+        } else {
+          ctx.fillStyle = "rgba(162, 164, 168, 0.1)";
+          ctx.fillRect(startX, chart.scales.y.top, endX - startX, chart.scales.y.bottom - chart.scales.y.top);
         }
       })
       ctx.restore();
